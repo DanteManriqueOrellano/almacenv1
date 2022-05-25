@@ -1,5 +1,7 @@
 import {Injectable} from "@tsed/di";
+import { Console } from "console";
 import { GoogleSpreadsheet, GoogleSpreadsheetWorksheet, ServiceAccountCredentials } from 'google-spreadsheet';
+import { SalidaModel } from "src/models/SalidaModel";
 
 export interface Context {
     dataSources: {
@@ -7,7 +9,7 @@ export interface Context {
     };
 }
 export type createInput<T> = {
-    dataObj: T 
+    values: {[header: string]: string | number | boolean }
 }
 
 interface IDatabase {
@@ -22,13 +24,13 @@ interface IDatabase {
 
 @Injectable()
 export class GooglesheetService implements IDatabase{
-    public sheetName:string ="NONE"; 
+    public sheetName:string; 
     private doc:GoogleSpreadsheet;
     private credentials:ServiceAccountCredentials;
 
-    async create<T>(input: createInput<T>, id?: string): Promise<any> {
-        let sheet = this.loadSheet(this.sheetName)
-        
+    async create<T>(input: createInput<T>): Promise<any> {
+        let sheet = await this.loadSheet(this.sheetName)
+        sheet.addRow(input.values)
     }
     /*
     async deleteById(id: string): Promise<string> {
